@@ -1,5 +1,6 @@
 """
 台灣氣溫地圖視覺化模組 (課程序號 17, 18, 19)
+支援中央氣象署 CWA O-A0003-001 觀測站經緯度與即時天氣觀測。
 使用 Folium 繪製互動式地圖，依據溫度高低提供色彩標記、資訊快顯 (Popup) 與圖例 (Legend)。
 """
 
@@ -7,15 +8,15 @@ import folium
 from folium import plugins
 import pandas as pd
 
-# 各地區代表經緯度坐標
-REGION_COORDINATES = {
-    "北部地區": {"lat": 25.0478, "lon": 121.5319, "name": "北部地區 (臺北/新北/基隆/桃竹苗)"},
-    "中部地區": {"lat": 24.1477, "lon": 120.6736, "name": "中部地區 (臺中/彰化/南投/雲林)"},
-    "南部地區": {"lat": 22.6273, "lon": 120.3014, "name": "南部地區 (嘉義/臺南/高雄/屏東)"},
-    "東部地區": {"lat": 23.9772, "lon": 121.6044, "name": "東部地區 (宜蘭/花蓮/臺東)"},
+# 各地區代表經緯度坐標 (備援)
+FALLBACK_COORDINATES = {
+    "北部地區": {"lat": 25.0478, "lon": 121.5319, "name": "北部地區"},
+    "中部地區": {"lat": 24.1477, "lon": 120.6736, "name": "中部地區"},
+    "南部地區": {"lat": 22.6273, "lon": 120.3014, "name": "南部地區"},
+    "東部地區": {"lat": 23.9772, "lon": 121.6044, "name": "東部地區"},
+    "離島地區": {"lat": 23.5656, "lon": 119.5630, "name": "離島地區"},
 }
 
-# 預設備用坐標 (台灣中心)
 DEFAULT_CENTER = [23.85, 120.95]
 
 
@@ -28,13 +29,13 @@ def get_temperature_color(avg_temp: float) -> str:
     > 30°C: 紅色
     """
     if avg_temp < 20.0:
-        return "#2B6CB0"  # 藍色 (冷)
+        return "#2B6CB0"
     elif avg_temp <= 25.0:
-        return "#38A169"  # 綠色 (舒適)
+        return "#38A169"
     elif avg_temp <= 30.0:
-        return "#DD6B20"  # 橘黃色 (溫暖)
+        return "#DD6B20"
     else:
-        return "#E53E3E"  # 紅色 (炎熱)
+        return "#E53E3E"
 
 
 def get_temperature_category_label(avg_temp: float) -> str:
@@ -52,8 +53,8 @@ def get_temperature_category_label(avg_temp: float) -> str:
 def create_weather_map(df_date: pd.DataFrame, selected_date: str) -> folium.Map:
     """
     建立指定日期的台灣氣溫視覺化地圖 (課程序號 17, 18, 19)
+    整合 CWA O-A0003-001 測站經緯度
     """
-    # 建立 Folium 地圖物件，以台灣中央山脈為中心
     m = folium.Map(
         location=DEFAULT_CENTER,
         zoom_start=7.4,
@@ -61,21 +62,21 @@ def create_weather_map(df_date: pd.DataFrame, selected_date: str) -> folium.Map:
         control_scale=True
     )
 
-    # 地圖標題控制元件
+    # 頂部標題
     title_html = f"""
     <div style="position: fixed; 
-                top: 15px; left: 60px; width: 280px; height: 50px; 
+                top: 15px; left: 60px; width: 340px; height: 50px; 
                 background-color: rgba(255, 255, 255, 0.95); 
                 border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-                z-index: 9999; font-size: 14px; font-weight: bold;
+                z-index: 9999; font-size: 13px; font-weight: bold;
                 display: flex; align-items: center; justify-content: center;
                 border: 1px solid #e2e8f0; color: #1a202c; font-family: sans-serif;">
-        🇹🇼 台灣氣溫分布預報 ({selected_date})
+        🇹🇼 CWA O-A0003-001 氣象觀測站分布 ({selected_date})
     </div>
     """
     m.get_root().html.add_child(folium.Element(title_html))
 
-    # 右下角圖例 (Legend) - 課程序號 17
+    # 圖例 (Legend) - 課程序號 17
     legend_html = """
     <div style="position: fixed; 
                 bottom: 25px; right: 25px; width: 175px; 
@@ -106,27 +107,42 @@ def create_weather_map(df_date: pd.DataFrame, selected_date: str) -> folium.Map:
     """
     m.get_root().html.add_child(folium.Element(legend_html))
 
-    # 繪製各區氣溫標記
+    # 繪製各測站/地區氣溫標記
     for _, row in df_date.iterrows():
         region = row["regionName"]
         min_t = float(row["minT"])
         max_t = float(row["maxT"])
+        cur_t = float(row["currentT"]) if pd.notna(row.get("currentT")) else round((min_t + max_t) / 2.0, 1)
+        weather_text = str(row.get("weather", "良好")) if pd.notna(row.get("weather")) else "良好"
         avg_t = round((min_t + max_t) / 2.0, 1)
 
-        coords = REGION_COORDINATES.get(region)
-        if not coords:
-            continue
+        # 優先使用 O-A0003-001 測站實測經緯度
+        lat = row.get("latitude")
+        lon = row.get("longitude")
+
+        if pd.isna(lat) or pd.isna(lon) or not lat or not lon:
+            fb = FALLBACK_COORDINATES.get(region)
+            if fb:
+                lat, lon = fb["lat"], fb["lon"]
+            else:
+                continue
 
         color = get_temperature_color(avg_t)
         category = get_temperature_category_label(avg_t)
 
         popup_content = f"""
-        <div style="font-family: sans-serif; min-width: 170px; padding: 4px;">
+        <div style="font-family: sans-serif; min-width: 175px; padding: 4px;">
             <h4 style="margin: 0 0 6px 0; color: #2b6cb0; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px;">
-                📍 {coords['name']}
+                📍 測站/分區：{region}
             </h4>
             <div style="margin: 4px 0; font-size: 13px;">
-                <b>📅 預報日期：</b>{selected_date}
+                <b>📅 觀測日期：</b>{selected_date}
+            </div>
+            <div style="margin: 4px 0; font-size: 13px;">
+                <b>⛅ 天氣狀況：</b>{weather_text}
+            </div>
+            <div style="margin: 4px 0; font-size: 13px;">
+                <b>🌡️ 即時/均溫：</b><span style="color: {color}; font-weight: bold;">{cur_t}°C</span>
             </div>
             <div style="margin: 4px 0; font-size: 13px;">
                 <b>🔥 最高氣溫：</b><span style="color: #e53e3e; font-weight: bold;">{max_t}°C</span>
@@ -134,21 +150,17 @@ def create_weather_map(df_date: pd.DataFrame, selected_date: str) -> folium.Map:
             <div style="margin: 4px 0; font-size: 13px;">
                 <b>❄️ 最低氣溫：</b><span style="color: #3182ce; font-weight: bold;">{min_t}°C</span>
             </div>
-            <div style="margin: 4px 0; font-size: 13px;">
-                <b>🌡️ 平均氣溫：</b><span style="color: {color}; font-weight: bold;">{avg_t}°C</span>
-            </div>
             <div style="margin-top: 6px; padding: 3px 6px; background-color: {color}22; border-left: 3px solid {color}; border-radius: 3px; font-size: 12px;">
-                狀態：<b>{category}</b>
+                舒適度評級：<b>{category}</b>
             </div>
         </div>
         """
 
-        # 標記圓形光暈 (CircleMarker)
         folium.CircleMarker(
-            location=[coords["lat"], coords["lon"]],
-            radius=24,
+            location=[float(lat), float(lon)],
+            radius=20,
             popup=folium.Popup(popup_content, max_width=300),
-            tooltip=f"{region}: 最低 {min_t}°C / 最高 {max_t}°C (均溫 {avg_t}°C)",
+            tooltip=f"{region}: 氣溫 {cur_t}°C ({weather_text})",
             color=color,
             weight=3,
             fill=True,
@@ -156,15 +168,14 @@ def create_weather_map(df_date: pd.DataFrame, selected_date: str) -> folium.Map:
             fill_opacity=0.65
         ).add_to(m)
 
-        # 在圓心顯示平均溫度文字標籤
         folium.Marker(
-            location=[coords["lat"], coords["lon"]],
+            location=[float(lat), float(lon)],
             icon=folium.DivIcon(
                 html=f"""
-                <div style="font-size: 11pt; font-weight: 800; color: #ffffff; 
+                <div style="font-size: 10pt; font-weight: 800; color: #ffffff; 
                             text-align: center; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
                             transform: translate(-50%, -50%); pointer-events: none;">
-                    {avg_t}°
+                    {cur_t}°
                 </div>
                 """
             )

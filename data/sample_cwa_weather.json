@@ -1,143 +1,256 @@
 {
   "success": "true",
   "result": {
-    "resource_id": "F-D0047-091",
+    "resource_id": "O-A0003-001",
     "fields": [
-      {"id": "datasetDescription", "type": "String"},
-      {"id": "locations", "type": "String"}
+      {"id": "StationName", "type": "String"},
+      {"id": "StationId", "type": "String"},
+      {"id": "ObsTime", "type": "String"},
+      {"id": "GeoInfo", "type": "String"},
+      {"id": "WeatherElement", "type": "String"}
     ]
   },
   "records": {
-    "locations": [
+    "Station": [
       {
-        "datasetDescription": "臺灣各地區一週天氣預報",
-        "locationsName": "臺灣地區",
-        "location": [
-          {
-            "locationName": "北部地區",
-            "weatherElement": [
-              {
-                "elementName": "MinT",
-                "description": "最低溫度",
-                "time": [
-                  {"startTime": "2026-09-23 00:00:00", "endTime": "2026-09-23 23:59:59", "elementValue": [{"value": "24", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-24 00:00:00", "endTime": "2026-09-24 23:59:59", "elementValue": [{"value": "23", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-25 00:00:00", "endTime": "2026-09-25 23:59:59", "elementValue": [{"value": "22", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-26 00:00:00", "endTime": "2026-09-26 23:59:59", "elementValue": [{"value": "23", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-27 00:00:00", "endTime": "2026-09-27 23:59:59", "elementValue": [{"value": "24", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-28 00:00:00", "endTime": "2026-09-28 23:59:59", "elementValue": [{"value": "25", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-29 00:00:00", "endTime": "2026-09-29 23:59:59", "elementValue": [{"value": "24", "measures": "攝氏度"}]}
-                ]
-              },
-              {
-                "elementName": "MaxT",
-                "description": "最高溫度",
-                "time": [
-                  {"startTime": "2026-09-23 00:00:00", "endTime": "2026-09-23 23:59:59", "elementValue": [{"value": "31", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-24 00:00:00", "endTime": "2026-09-24 23:59:59", "elementValue": [{"value": "30", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-25 00:00:00", "endTime": "2026-09-25 23:59:59", "elementValue": [{"value": "29", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-26 00:00:00", "endTime": "2026-09-26 23:59:59", "elementValue": [{"value": "30", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-27 00:00:00", "endTime": "2026-09-27 23:59:59", "elementValue": [{"value": "32", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-28 00:00:00", "endTime": "2026-09-28 23:59:59", "elementValue": [{"value": "33", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-29 00:00:00", "endTime": "2026-09-29 23:59:59", "elementValue": [{"value": "31", "measures": "攝氏度"}]}
-                ]
-              }
-            ]
-          },
-          {
-            "locationName": "中部地區",
-            "weatherElement": [
-              {
-                "elementName": "MinT",
-                "description": "最低溫度",
-                "time": [
-                  {"startTime": "2026-09-23 00:00:00", "endTime": "2026-09-23 23:59:59", "elementValue": [{"value": "23", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-24 00:00:00", "endTime": "2026-09-24 23:59:59", "elementValue": [{"value": "23", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-25 00:00:00", "endTime": "2026-09-25 23:59:59", "elementValue": [{"value": "22", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-26 00:00:00", "endTime": "2026-09-26 23:59:59", "elementValue": [{"value": "23", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-27 00:00:00", "endTime": "2026-09-27 23:59:59", "elementValue": [{"value": "24", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-28 00:00:00", "endTime": "2026-09-28 23:59:59", "elementValue": [{"value": "24", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-29 00:00:00", "endTime": "2026-09-29 23:59:59", "elementValue": [{"value": "23", "measures": "攝氏度"}]}
-                ]
-              },
-              {
-                "elementName": "MaxT",
-                "description": "最高溫度",
-                "time": [
-                  {"startTime": "2026-09-23 00:00:00", "endTime": "2026-09-23 23:59:59", "elementValue": [{"value": "32", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-24 00:00:00", "endTime": "2026-09-24 23:59:59", "elementValue": [{"value": "32", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-25 00:00:00", "endTime": "2026-09-25 23:59:59", "elementValue": [{"value": "31", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-26 00:00:00", "endTime": "2026-09-26 23:59:59", "elementValue": [{"value": "32", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-27 00:00:00", "endTime": "2026-09-27 23:59:59", "elementValue": [{"value": "33", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-28 00:00:00", "endTime": "2026-09-28 23:59:59", "elementValue": [{"value": "34", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-29 00:00:00", "endTime": "2026-09-29 23:59:59", "elementValue": [{"value": "33", "measures": "攝氏度"}]}
-                ]
-              }
-            ]
-          },
-          {
-            "locationName": "南部地區",
-            "weatherElement": [
-              {
-                "elementName": "MinT",
-                "description": "最低溫度",
-                "time": [
-                  {"startTime": "2026-09-23 00:00:00", "endTime": "2026-09-23 23:59:59", "elementValue": [{"value": "25", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-24 00:00:00", "endTime": "2026-09-24 23:59:59", "elementValue": [{"value": "24", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-25 00:00:00", "endTime": "2026-09-25 23:59:59", "elementValue": [{"value": "24", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-26 00:00:00", "endTime": "2026-09-26 23:59:59", "elementValue": [{"value": "25", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-27 00:00:00", "endTime": "2026-09-27 23:59:59", "elementValue": [{"value": "25", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-28 00:00:00", "endTime": "2026-09-28 23:59:59", "elementValue": [{"value": "26", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-29 00:00:00", "endTime": "2026-09-29 23:59:59", "elementValue": [{"value": "25", "measures": "攝氏度"}]}
-                ]
-              },
-              {
-                "elementName": "MaxT",
-                "description": "最高溫度",
-                "time": [
-                  {"startTime": "2026-09-23 00:00:00", "endTime": "2026-09-23 23:59:59", "elementValue": [{"value": "33", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-24 00:00:00", "endTime": "2026-09-24 23:59:59", "elementValue": [{"value": "33", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-25 00:00:00", "endTime": "2026-09-25 23:59:59", "elementValue": [{"value": "32", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-26 00:00:00", "endTime": "2026-09-26 23:59:59", "elementValue": [{"value": "33", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-27 00:00:00", "endTime": "2026-09-27 23:59:59", "elementValue": [{"value": "34", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-28 00:00:00", "endTime": "2026-09-28 23:59:59", "elementValue": [{"value": "34", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-29 00:00:00", "endTime": "2026-09-29 23:59:59", "elementValue": [{"value": "33", "measures": "攝氏度"}]}
-                ]
-              }
-            ]
-          },
-          {
-            "locationName": "東部地區",
-            "weatherElement": [
-              {
-                "elementName": "MinT",
-                "description": "最低溫度",
-                "time": [
-                  {"startTime": "2026-09-23 00:00:00", "endTime": "2026-09-23 23:59:59", "elementValue": [{"value": "23", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-24 00:00:00", "endTime": "2026-09-24 23:59:59", "elementValue": [{"value": "22", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-25 00:00:00", "endTime": "2026-09-25 23:59:59", "elementValue": [{"value": "22", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-26 00:00:00", "endTime": "2026-09-26 23:59:59", "elementValue": [{"value": "23", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-27 00:00:00", "endTime": "2026-09-27 23:59:59", "elementValue": [{"value": "23", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-28 00:00:00", "endTime": "2026-09-28 23:59:59", "elementValue": [{"value": "24", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-29 00:00:00", "endTime": "2026-09-29 23:59:59", "elementValue": [{"value": "23", "measures": "攝氏度"}]}
-                ]
-              },
-              {
-                "elementName": "MaxT",
-                "description": "最高溫度",
-                "time": [
-                  {"startTime": "2026-09-23 00:00:00", "endTime": "2026-09-23 23:59:59", "elementValue": [{"value": "29", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-24 00:00:00", "endTime": "2026-09-24 23:59:59", "elementValue": [{"value": "29", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-25 00:00:00", "endTime": "2026-09-25 23:59:59", "elementValue": [{"value": "28", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-26 00:00:00", "endTime": "2026-09-26 23:59:59", "elementValue": [{"value": "29", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-27 00:00:00", "endTime": "2026-09-27 23:59:59", "elementValue": [{"value": "30", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-28 00:00:00", "endTime": "2026-09-28 23:59:59", "elementValue": [{"value": "31", "measures": "攝氏度"}]},
-                  {"startTime": "2026-09-29 00:00:00", "endTime": "2026-09-29 23:59:59", "elementValue": [{"value": "30", "measures": "攝氏度"}]}
-                ]
-              }
-            ]
+        "StationName": "基隆",
+        "StationId": "466940",
+        "GeoInfo": {
+          "Coordinates": [{"StationLatitude": 25.1333, "StationLongitude": 121.7405}],
+          "CountyName": "基隆市"
+        },
+        "ObsTime": {"DateTime": "2026-09-23T11:00:00+08:00"},
+        "WeatherElement": {
+          "Weather": "多雲",
+          "AirTemperature": 27.8,
+          "RelativeHumidity": 78,
+          "WindSpeed": 3.4,
+          "AirPressure": 1012.3,
+          "DailyExtreme": {
+            "DailyHigh": {"ExtremeInfo": {"AirTemperature": 30.5}},
+            "DailyLow": {"ExtremeInfo": {"AirTemperature": 23.2}}
           }
-        ]
+        }
+      },
+      {
+        "StationName": "臺北",
+        "StationId": "466920",
+        "GeoInfo": {
+          "Coordinates": [{"StationLatitude": 25.0377, "StationLongitude": 121.5149}],
+          "CountyName": "臺北市"
+        },
+        "ObsTime": {"DateTime": "2026-09-23T11:00:00+08:00"},
+        "WeatherElement": {
+          "Weather": "晴時多雲",
+          "AirTemperature": 29.6,
+          "RelativeHumidity": 68,
+          "WindSpeed": 2.8,
+          "AirPressure": 1011.8,
+          "DailyExtreme": {
+            "DailyHigh": {"ExtremeInfo": {"AirTemperature": 32.2}},
+            "DailyLow": {"ExtremeInfo": {"AirTemperature": 23.8}}
+          }
+        }
+      },
+      {
+        "StationName": "新竹",
+        "StationId": "467571",
+        "GeoInfo": {
+          "Coordinates": [{"StationLatitude": 24.8279, "StationLongitude": 121.0142}],
+          "CountyName": "新竹縣"
+        },
+        "ObsTime": {"DateTime": "2026-09-23T11:00:00+08:00"},
+        "WeatherElement": {
+          "Weather": "晴",
+          "AirTemperature": 29.1,
+          "RelativeHumidity": 65,
+          "WindSpeed": 4.1,
+          "AirPressure": 1012.0,
+          "DailyExtreme": {
+            "DailyHigh": {"ExtremeInfo": {"AirTemperature": 31.8}},
+            "DailyLow": {"ExtremeInfo": {"AirTemperature": 23.0}}
+          }
+        }
+      },
+      {
+        "StationName": "臺中",
+        "StationId": "467490",
+        "GeoInfo": {
+          "Coordinates": [{"StationLatitude": 24.1457, "StationLongitude": 120.6841}],
+          "CountyName": "臺中市"
+        },
+        "ObsTime": {"DateTime": "2026-09-23T11:00:00+08:00"},
+        "WeatherElement": {
+          "Weather": "晴",
+          "AirTemperature": 31.4,
+          "RelativeHumidity": 62,
+          "WindSpeed": 2.2,
+          "AirPressure": 1010.9,
+          "DailyExtreme": {
+            "DailyHigh": {"ExtremeInfo": {"AirTemperature": 33.5}},
+            "DailyLow": {"ExtremeInfo": {"AirTemperature": 24.0}}
+          }
+        }
+      },
+      {
+        "StationName": "日月潭",
+        "StationId": "467650",
+        "GeoInfo": {
+          "Coordinates": [{"StationLatitude": 23.8813, "StationLongitude": 120.9081}],
+          "CountyName": "南投縣"
+        },
+        "ObsTime": {"DateTime": "2026-09-23T11:00:00+08:00"},
+        "WeatherElement": {
+          "Weather": "陰天",
+          "AirTemperature": 24.8,
+          "RelativeHumidity": 82,
+          "WindSpeed": 1.5,
+          "AirPressure": 905.2,
+          "DailyExtreme": {
+            "DailyHigh": {"ExtremeInfo": {"AirTemperature": 26.8}},
+            "DailyLow": {"ExtremeInfo": {"AirTemperature": 19.5}}
+          }
+        }
+      },
+      {
+        "StationName": "臺南",
+        "StationId": "467410",
+        "GeoInfo": {
+          "Coordinates": [{"StationLatitude": 22.9933, "StationLongitude": 120.2048}],
+          "CountyName": "臺南市"
+        },
+        "ObsTime": {"DateTime": "2026-09-23T11:00:00+08:00"},
+        "WeatherElement": {
+          "Weather": "晴時多雲",
+          "AirTemperature": 32.0,
+          "RelativeHumidity": 70,
+          "WindSpeed": 2.9,
+          "AirPressure": 1010.5,
+          "DailyExtreme": {
+            "DailyHigh": {"ExtremeInfo": {"AirTemperature": 33.8}},
+            "DailyLow": {"ExtremeInfo": {"AirTemperature": 25.2}}
+          }
+        }
+      },
+      {
+        "StationName": "高雄",
+        "StationId": "467440",
+        "GeoInfo": {
+          "Coordinates": [{"StationLatitude": 22.5660, "StationLongitude": 120.3157}],
+          "CountyName": "高雄市"
+        },
+        "ObsTime": {"DateTime": "2026-09-23T11:00:00+08:00"},
+        "WeatherElement": {
+          "Weather": "晴",
+          "AirTemperature": 32.5,
+          "RelativeHumidity": 69,
+          "WindSpeed": 3.1,
+          "AirPressure": 1010.2,
+          "DailyExtreme": {
+            "DailyHigh": {"ExtremeInfo": {"AirTemperature": 34.2}},
+            "DailyLow": {"ExtremeInfo": {"AirTemperature": 26.0}}
+          }
+        }
+      },
+      {
+        "StationName": "恆春",
+        "StationId": "467590",
+        "GeoInfo": {
+          "Coordinates": [{"StationLatitude": 22.0039, "StationLongitude": 120.7463}],
+          "CountyName": "屏東縣"
+        },
+        "ObsTime": {"DateTime": "2026-09-23T11:00:00+08:00"},
+        "WeatherElement": {
+          "Weather": "多雲局部雨",
+          "AirTemperature": 30.2,
+          "RelativeHumidity": 75,
+          "WindSpeed": 5.2,
+          "AirPressure": 1011.0,
+          "DailyExtreme": {
+            "DailyHigh": {"ExtremeInfo": {"AirTemperature": 32.0}},
+            "DailyLow": {"ExtremeInfo": {"AirTemperature": 25.5}}
+          }
+        }
+      },
+      {
+        "StationName": "宜蘭",
+        "StationId": "467080",
+        "GeoInfo": {
+          "Coordinates": [{"StationLatitude": 24.7640, "StationLongitude": 121.7565}],
+          "CountyName": "宜蘭縣"
+        },
+        "ObsTime": {"DateTime": "2026-09-23T11:00:00+08:00"},
+        "WeatherElement": {
+          "Weather": "陰短暫雨",
+          "AirTemperature": 27.2,
+          "RelativeHumidity": 85,
+          "WindSpeed": 2.1,
+          "AirPressure": 1012.4,
+          "DailyExtreme": {
+            "DailyHigh": {"ExtremeInfo": {"AirTemperature": 29.5}},
+            "DailyLow": {"ExtremeInfo": {"AirTemperature": 22.8}}
+          }
+        }
+      },
+      {
+        "StationName": "花蓮",
+        "StationId": "466990",
+        "GeoInfo": {
+          "Coordinates": [{"StationLatitude": 23.9752, "StationLongitude": 121.6133}],
+          "CountyName": "花蓮縣"
+        },
+        "ObsTime": {"DateTime": "2026-09-23T11:00:00+08:00"},
+        "WeatherElement": {
+          "Weather": "多雲",
+          "AirTemperature": 28.6,
+          "RelativeHumidity": 74,
+          "WindSpeed": 3.0,
+          "AirPressure": 1011.7,
+          "DailyExtreme": {
+            "DailyHigh": {"ExtremeInfo": {"AirTemperature": 31.0}},
+            "DailyLow": {"ExtremeInfo": {"AirTemperature": 23.5}}
+          }
+        }
+      },
+      {
+        "StationName": "臺東",
+        "StationId": "467660",
+        "GeoInfo": {
+          "Coordinates": [{"StationLatitude": 22.7554, "StationLongitude": 121.1546}],
+          "CountyName": "臺東縣"
+        },
+        "ObsTime": {"DateTime": "2026-09-23T11:00:00+08:00"},
+        "WeatherElement": {
+          "Weather": "晴時多雲",
+          "AirTemperature": 30.1,
+          "RelativeHumidity": 72,
+          "WindSpeed": 3.6,
+          "AirPressure": 1011.2,
+          "DailyExtreme": {
+            "DailyHigh": {"ExtremeInfo": {"AirTemperature": 32.4}},
+            "DailyLow": {"ExtremeInfo": {"AirTemperature": 24.2}}
+          }
+        }
+      },
+      {
+        "StationName": "澎湖",
+        "StationId": "467350",
+        "GeoInfo": {
+          "Coordinates": [{"StationLatitude": 23.5656, "StationLongitude": 119.5630}],
+          "CountyName": "澎湖縣"
+        },
+        "ObsTime": {"DateTime": "2026-09-23T11:00:00+08:00"},
+        "WeatherElement": {
+          "Weather": "晴",
+          "AirTemperature": 29.8,
+          "RelativeHumidity": 71,
+          "WindSpeed": 4.5,
+          "AirPressure": 1011.5,
+          "DailyExtreme": {
+            "DailyHigh": {"ExtremeInfo": {"AirTemperature": 31.5}},
+            "DailyLow": {"ExtremeInfo": {"AirTemperature": 25.0}}
+          }
+        }
       }
     ]
   }
