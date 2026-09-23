@@ -160,7 +160,7 @@ ensure_db_ready()
 
 # --- 側邊欄控制器 (課程序號 3, 4, 13, 18) ---
 with st.sidebar:
-    st.image("https://images.unsplash.com/photo-1592210454359-9043f067919b?w=500&auto=format&fit=crop&q=60", use_container_width=True)
+    st.image("https://images.unsplash.com/photo-1592210454359-9043f067919b?w=500&auto=format&fit=crop&q=60", width='stretch')
     st.title("⚙️ 系統控制台")
     st.caption("AI 創新微課程實作 · Antigravity × Gemini")
     
@@ -174,7 +174,7 @@ with st.sidebar:
         help="登入中央氣象署開放資料平台即可免費取得。未填寫時系統將使用內建完整預報資料展示。"
     )
     
-    if st.button("🔄 同步 / 更新氣象資料庫", use_container_width=True, type="primary"):
+    if st.button("🔄 同步 / 更新氣象資料庫", width='stretch', type="primary"):
         with st.spinner("正在自 CWA API 擷取與同步至 SQLite 資料庫..."):
             success, msg, _ = update_weather_data(api_key=api_key_input)
             if success:
