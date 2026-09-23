@@ -7,7 +7,12 @@
 
 ---
 
-## 📖 專案簡介 (Project Overview)
+## 🌐 快速體驗連結 (Quick Access)
+
+- **🖥️ 本機運行網址**：[http://localhost:8501](http://localhost:8501)（若已在電腦啟動程式，點擊即可直接開啟）
+- **☁️ 雲端公開網址**：可透過 [Streamlit Community Cloud](https://share.streamlit.io/) 一鍵綁定本儲存庫免費部署，獲得全公開作品網址！
+
+---
 
 本專案完全遵循**煥哥《打造你的 AI Coding Agent》微課程教學之 24 個步驟**，並因應課堂指定，精確對接**中央氣象署開放資料平臺之 `O-A0003-001` 局屬氣象測站即時觀測報告**。
 
