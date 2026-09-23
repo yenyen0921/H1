@@ -1,0 +1,173 @@
+"""
+台灣氣溫地圖視覺化模組 (課程序號 17, 18, 19)
+使用 Folium 繪製互動式地圖，依據溫度高低提供色彩標記、資訊快顯 (Popup) 與圖例 (Legend)。
+"""
+
+import folium
+from folium import plugins
+import pandas as pd
+
+# 各地區代表經緯度坐標
+REGION_COORDINATES = {
+    "北部地區": {"lat": 25.0478, "lon": 121.5319, "name": "北部地區 (臺北/新北/基隆/桃竹苗)"},
+    "中部地區": {"lat": 24.1477, "lon": 120.6736, "name": "中部地區 (臺中/彰化/南投/雲林)"},
+    "南部地區": {"lat": 22.6273, "lon": 120.3014, "name": "南部地區 (嘉義/臺南/高雄/屏東)"},
+    "東部地區": {"lat": 23.9772, "lon": 121.6044, "name": "東部地區 (宜蘭/花蓮/臺東)"},
+}
+
+# 預設備用坐標 (台灣中心)
+DEFAULT_CENTER = [23.85, 120.95]
+
+
+def get_temperature_color(avg_temp: float) -> str:
+    """
+    依據溫度獲取對應標記顏色 (課程序號 17 圖例規範)
+    < 20°C: 藍色
+    20 - 25°C: 綠色
+    25 - 30°C: 橘黃色
+    > 30°C: 紅色
+    """
+    if avg_temp < 20.0:
+        return "#2B6CB0"  # 藍色 (冷)
+    elif avg_temp <= 25.0:
+        return "#38A169"  # 綠色 (舒適)
+    elif avg_temp <= 30.0:
+        return "#DD6B20"  # 橘黃色 (溫暖)
+    else:
+        return "#E53E3E"  # 紅色 (炎熱)
+
+
+def get_temperature_category_label(avg_temp: float) -> str:
+    """回傳溫度區間說明標籤"""
+    if avg_temp < 20.0:
+        return "涼爽 (< 20°C)"
+    elif avg_temp <= 25.0:
+        return "舒適 (20 ~ 25°C)"
+    elif avg_temp <= 30.0:
+        return "溫暖 (25 ~ 30°C)"
+    else:
+        return "炎熱 (> 30°C)"
+
+
+def create_weather_map(df_date: pd.DataFrame, selected_date: str) -> folium.Map:
+    """
+    建立指定日期的台灣氣溫視覺化地圖 (課程序號 17, 18, 19)
+    """
+    # 建立 Folium 地圖物件，以台灣中央山脈為中心
+    m = folium.Map(
+        location=DEFAULT_CENTER,
+        zoom_start=7.4,
+        tiles="OpenStreetMap",
+        control_scale=True
+    )
+
+    # 地圖標題控制元件
+    title_html = f"""
+    <div style="position: fixed; 
+                top: 15px; left: 60px; width: 280px; height: 50px; 
+                background-color: rgba(255, 255, 255, 0.95); 
+                border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+                z-index: 9999; font-size: 14px; font-weight: bold;
+                display: flex; align-items: center; justify-content: center;
+                border: 1px solid #e2e8f0; color: #1a202c; font-family: sans-serif;">
+        🇹🇼 台灣氣溫分布預報 ({selected_date})
+    </div>
+    """
+    m.get_root().html.add_child(folium.Element(title_html))
+
+    # 右下角圖例 (Legend) - 課程序號 17
+    legend_html = """
+    <div style="position: fixed; 
+                bottom: 25px; right: 25px; width: 175px; 
+                background-color: rgba(255, 255, 255, 0.95); 
+                border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                z-index: 9999; font-size: 13px; padding: 12px;
+                border: 1px solid #e2e8f0; font-family: sans-serif;">
+        <div style="font-weight: bold; margin-bottom: 8px; color: #2d3748; border-bottom: 1px solid #edf2f7; padding-bottom: 4px;">
+            🌡️ 平均溫度色彩
+        </div>
+        <div style="display: flex; align-items: center; margin-bottom: 5px;">
+            <span style="background: #2B6CB0; width: 14px; height: 14px; border-radius: 50%; display: inline-block; margin-right: 8px;"></span>
+            <span style="color: #4a5568;">&lt; 20°C (低溫)</span>
+        </div>
+        <div style="display: flex; align-items: center; margin-bottom: 5px;">
+            <span style="background: #38A169; width: 14px; height: 14px; border-radius: 50%; display: inline-block; margin-right: 8px;"></span>
+            <span style="color: #4a5568;">20 - 25°C (舒適)</span>
+        </div>
+        <div style="display: flex; align-items: center; margin-bottom: 5px;">
+            <span style="background: #DD6B20; width: 14px; height: 14px; border-radius: 50%; display: inline-block; margin-right: 8px;"></span>
+            <span style="color: #4a5568;">25 - 30°C (溫暖)</span>
+        </div>
+        <div style="display: flex; align-items: center;">
+            <span style="background: #E53E3E; width: 14px; height: 14px; border-radius: 50%; display: inline-block; margin-right: 8px;"></span>
+            <span style="color: #4a5568;">&gt; 30°C (炎熱)</span>
+        </div>
+    </div>
+    """
+    m.get_root().html.add_child(folium.Element(legend_html))
+
+    # 繪製各區氣溫標記
+    for _, row in df_date.iterrows():
+        region = row["regionName"]
+        min_t = float(row["minT"])
+        max_t = float(row["maxT"])
+        avg_t = round((min_t + max_t) / 2.0, 1)
+
+        coords = REGION_COORDINATES.get(region)
+        if not coords:
+            continue
+
+        color = get_temperature_color(avg_t)
+        category = get_temperature_category_label(avg_t)
+
+        popup_content = f"""
+        <div style="font-family: sans-serif; min-width: 170px; padding: 4px;">
+            <h4 style="margin: 0 0 6px 0; color: #2b6cb0; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px;">
+                📍 {coords['name']}
+            </h4>
+            <div style="margin: 4px 0; font-size: 13px;">
+                <b>📅 預報日期：</b>{selected_date}
+            </div>
+            <div style="margin: 4px 0; font-size: 13px;">
+                <b>🔥 最高氣溫：</b><span style="color: #e53e3e; font-weight: bold;">{max_t}°C</span>
+            </div>
+            <div style="margin: 4px 0; font-size: 13px;">
+                <b>❄️ 最低氣溫：</b><span style="color: #3182ce; font-weight: bold;">{min_t}°C</span>
+            </div>
+            <div style="margin: 4px 0; font-size: 13px;">
+                <b>🌡️ 平均氣溫：</b><span style="color: {color}; font-weight: bold;">{avg_t}°C</span>
+            </div>
+            <div style="margin-top: 6px; padding: 3px 6px; background-color: {color}22; border-left: 3px solid {color}; border-radius: 3px; font-size: 12px;">
+                狀態：<b>{category}</b>
+            </div>
+        </div>
+        """
+
+        # 標記圓形光暈 (CircleMarker)
+        folium.CircleMarker(
+            location=[coords["lat"], coords["lon"]],
+            radius=24,
+            popup=folium.Popup(popup_content, max_width=300),
+            tooltip=f"{region}: 最低 {min_t}°C / 最高 {max_t}°C (均溫 {avg_t}°C)",
+            color=color,
+            weight=3,
+            fill=True,
+            fill_color=color,
+            fill_opacity=0.65
+        ).add_to(m)
+
+        # 在圓心顯示平均溫度文字標籤
+        folium.Marker(
+            location=[coords["lat"], coords["lon"]],
+            icon=folium.DivIcon(
+                html=f"""
+                <div style="font-size: 11pt; font-weight: 800; color: #ffffff; 
+                            text-align: center; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+                            transform: translate(-50%, -50%); pointer-events: none;">
+                    {avg_t}°
+                </div>
+                """
+            )
+        ).add_to(m)
+
+    return m
