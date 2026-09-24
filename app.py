@@ -372,7 +372,22 @@ with tab3:
             st.rerun()
 
     current_channel_meta = channels[selected_cid]
-    frames = get_channel_frames(selected_cid, limit=12)
+
+    # 縮時歷程長度選擇
+    num_frames = 12
+    if view_mode == "動態縮時歷程 (Timelapse)":
+        col_frame_opt, col_tip = st.columns([1, 2])
+        with col_frame_opt:
+            num_frames = st.selectbox(
+                "歷程跨度：",
+                options=[6, 12, 18, 24],
+                format_func=lambda n: f"過去 {n} 幀 (~{n*10//60} 小時)",
+                index=1
+            )
+        with col_tip:
+            st.caption("每 10 分鐘一幀，可回溯長時間的大氣雲系移動趨勢。")
+
+    frames = get_channel_frames(selected_cid, limit=num_frames)
 
     # 選擇目前要顯示的影格
     selected_frame = frames[-1] if frames else {
@@ -390,6 +405,8 @@ with tab3:
             format_func=lambda idx: time_labels[idx]
         )
         selected_frame = frames[time_idx]
+
+    st.info("💡 **為什麼最新衛星雲圖時間約為 15:50 ~ 16:00？** 氣象衛星位於 36,000 公里高空地球同步軌道，自儀器掃描、地面站接收、幾何輻射校正到氣象署伺服器上架，常態約需 15~20 分鐘的物理傳輸與影像運算時間。因此在 16:15 前後，氣象署最新發布的觀測正是 15:50 或 16:00，此為國際氣象觀測標準正常延遲。")
 
     # 主圖片與詳細解說雙欄展示
     col_img, col_detail = st.columns([3, 2])
