@@ -34,7 +34,12 @@
 4. **Folium 測站真實經緯度地圖 (課程序號 17-18)**：
    - 直接依據 CWA 測站實測經緯度坐標繪製地圖。
    - 依照氣溫自動進行四級色彩渲染（藍、綠、橘黃、紅），並附詳細 Popup 快顯卡片與圖例。
-5. **內建 SQL Inspector (課程序號 10)**：
+   - 支援切換 Esri 航照衛星底圖、淺色/深色地圖，並可自由疊加**即時雷達迴波圖**與**台灣衛星雲圖**。
+5. **🛰️ CWA 即時高解析衛星雲圖中心 (新增功能)**：
+   - **多波段觀測頻道**：台灣彩色紅外線、色調強化、日間真實色彩、都卜勒雷達迴波、東亞全區與全球圓盤雲圖。
+   - **動態縮時歷程 (Timelapse)**：支援滑桿回溯過去多個時段的雲系動態演變。
+   - **專業氣象解讀指南**：內建雲頂溫度、強對流降雨判定與衛星判讀教學小百科。
+6. **內建 SQL Inspector (課程序號 10)**：
    - 支援在網頁上直接輸入並執行標準 SQL 語法進行驗證。
 
 ---
@@ -45,17 +50,23 @@
 Taiwan-Weather-Project/
 ├── data/
 │   ├── data.db                   # SQLite 資料庫 (儲存 O-A0003-001 觀測資料)
+│   ├── weather.json              # 22 縣市即時氣象快取
 │   └── sample_cwa_weather.json   # CWA O-A0003-001 標準格式範例資料
 ├── src/
 │   ├── __init__.py
 │   ├── database.py               # SQLite 資料庫連線、Schema 定義、去重寫入與查詢函式
 │   ├── weather_api.py            # CWA O-A0003-001 API 請求與 JSON 解析
-│   └── map_view.py               # Folium 測站經緯度地圖與四級色彩渲染
-├── app.py                        # Streamlit 主程式 (視覺化儀表板)
+│   ├── map_view.py               # Folium 測站經緯度地圖、衛星/雷達圖層疊加
+│   └── satellite.py              # CWA 衛星雲圖多頻道擷取、動態歷程與影像解析
+├── app.py                        # Streamlit 主程式 (含衛星雲圖專屬頁籤)
+├── index.html                    # 現代 Glassmorphism Web 前端介面
+├── script.js                     # Leaflet 互動地圖與衛星雲圖分析中心
+├── style.css                     # 精緻暗黑玻璃擬態現代樣式
 ├── requirements.txt              # 專案相依套件清單
 ├── .gitignore                    # Git 忽略檔案設定
 └── README.md                     # 專案詳細說明文件
 ```
+
 
 ---
 

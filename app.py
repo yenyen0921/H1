@@ -28,6 +28,7 @@ from src.database import (
 )
 from src.weather_api import update_weather_data, CWA_DATASET_ID
 from src.map_view import create_weather_map
+from src.satellite import get_satellite_channels, get_channel_frames, get_latest_satellite_image
 
 st.set_page_config(
     page_title="Taiwan Weather Observation | CWA O-A0003-001",
@@ -236,9 +237,10 @@ else:
 
 
 # --- 分頁標籤導覽 (Tabs) ---
-tab1, tab2, tab3 = st.tabs([
+tab1, tab2, tab3, tab4 = st.tabs([
     "📈 氣溫趨勢與資料表格 (Trend & Table)",
     "🗺️ CWA 測站地圖視覺化 (Station Map)",
+    "🛰️ 即時衛星雲圖 (Satellite View)",
     "💾 SQLite 資料庫檢查器 (SQL Inspector)"
 ])
 
@@ -291,15 +293,28 @@ with tab1:
 # =========================================================================
 with tab2:
     st.subheader(f"🗺️ 全台氣象測站即時分布地圖 — 【{selected_date}】")
-    st.caption("依據 CWA O-A0003-001 測站經緯度坐標精準繪製，並依照實測氣溫進行四級分色渲染。")
+    st.caption("依據 CWA O-A0003-001 測站經緯度坐標精準繪製，並依照實測氣溫進行四級分色渲染。可隨時疊加雷達與衛星圖層。")
 
     df_date_all = get_all_forecasts_by_date(selected_date)
 
     if not df_date_all.empty:
+        col_ctrl1, col_ctrl2, col_ctrl3 = st.columns([1, 1, 2])
+        with col_ctrl1:
+            overlay_radar = st.checkbox("📡 疊加 CWA 即時雷達迴波", value=False, help="將中央氣象署全台雷達整合迴波圖疊加於地圖上")
+        with col_ctrl2:
+            overlay_sat = st.checkbox("☁️ 疊加台灣衛星雲圖 (TWI)", value=False, help="將最新台灣鄰近海域彩色紅外線雲圖疊加於地圖上")
+        with col_ctrl3:
+            st.info("💡 提示：地圖右上角圖層控制器可自由切換 Esri 衛星底圖、淺色地圖與暗黑地圖。")
+
         col_map, col_info = st.columns([3, 2])
 
         with col_map:
-            weather_map = create_weather_map(df_date_all, selected_date)
+            weather_map = create_weather_map(
+                df_date_all,
+                selected_date,
+                show_radar=overlay_radar,
+                show_satellite=overlay_sat
+            )
             st_folium(weather_map, width=700, height=530)
 
         with col_info:
@@ -329,9 +344,135 @@ with tab2:
 
 
 # =========================================================================
-# TAB 3: SQLite 資料庫檢查器 (課程序號 8, 9, 10, 20)
+# TAB 3: 即時氣象衛星雲圖 (CWA Satellite Imagery Hub)
 # =========================================================================
 with tab3:
+    st.subheader("🛰️ 中央氣象署 (CWA) 即時高解析衛星雲圖")
+    st.caption("支援多波段衛星影像、台灣鄰近與東亞全區、色調強化、可見光與縮時動態歷程播放。")
+
+    channels = get_satellite_channels()
+    channel_options = {cid: cdata["name"] for cid, cdata in channels.items()}
+
+    col_sel1, col_sel2, col_sel3 = st.columns([2, 1, 1])
+    with col_sel1:
+        selected_cid = st.selectbox(
+            "選擇衛星雲圖觀測頻道：",
+            options=list(channel_options.keys()),
+            format_func=lambda x: channel_options[x],
+            index=0
+        )
+    with col_sel2:
+        view_mode = st.radio(
+            "檢視模式：",
+            options=["即時最新觀測", "動態縮時歷程 (Timelapse)"],
+            horizontal=True
+        )
+    with col_sel3:
+        if st.button("🔄 刷新最新雲圖", width='stretch'):
+            st.rerun()
+
+    current_channel_meta = channels[selected_cid]
+    frames = get_channel_frames(selected_cid, limit=12)
+
+    # 選擇目前要顯示的影格
+    selected_frame = frames[-1] if frames else {
+        "url": current_channel_meta["static_url"],
+        "time": "最新即時"
+    }
+
+    if view_mode == "動態縮時歷程 (Timelapse)" and len(frames) > 1:
+        st.markdown("##### ⏱️ 縮時時間軸控制 (每 10 分鐘一幀)")
+        time_labels = [f["time"] for f in frames]
+        time_idx = st.select_slider(
+            "滑動以回溯過去雲系演變歷程：",
+            options=list(range(len(frames))),
+            value=len(frames) - 1,
+            format_func=lambda idx: time_labels[idx]
+        )
+        selected_frame = frames[time_idx]
+
+    # 主圖片與詳細解說雙欄展示
+    col_img, col_detail = st.columns([3, 2])
+
+    with col_img:
+        st.markdown(f"""
+        <div style="background: #1a202c; padding: 12px; border-radius: 12px; border: 1px solid #2d3748; box-shadow: 0 4px 16px rgba(0,0,0,0.25);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; color: #e2e8f0; font-size: 13px;">
+                <span>📡 <b>{current_channel_meta['name']}</b></span>
+                <span style="background: #3182ce; padding: 3px 8px; border-radius: 12px; font-weight: bold;">🕒 {selected_frame['time']}</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.image(
+            selected_frame["url"],
+            caption=f"中央氣象署 CWA 觀測時間：{selected_frame['time']} ｜ 頻道：{current_channel_meta['name']}",
+            use_container_width=True
+        )
+
+        st.markdown(f"""
+        <div style="text-align: right; margin-top: 4px;">
+            <a href="{selected_frame['url']}" target="_blank" style="font-size: 12px; color: #3182ce; text-decoration: none;">
+                🔗 開啟氣象署高解析原始圖檔
+            </a>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col_detail:
+        st.markdown(f"""
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 16px;">
+            <h4 style="margin: 0 0 10px 0; color: #2b6cb0;">📋 頻道資訊與解讀</h4>
+            <p style="margin: 6px 0; font-size: 14px; color: #4a5568;">
+                <b>分類：</b>{current_channel_meta['category']}
+            </p>
+            <p style="margin: 6px 0; font-size: 14px; color: #4a5568;">
+                <b>影像解析度：</b>{current_channel_meta['resolution']}
+            </p>
+            <p style="margin: 6px 0; font-size: 14px; color: #4a5568;">
+                <b>頻道說明：</b>{current_channel_meta['desc']}
+            </p>
+            <div style="margin-top: 12px; padding: 12px; background: #ebf8ff; border-left: 4px solid #3182ce; border-radius: 6px; font-size: 13px; color: #2c5282;">
+                <b>💡 判讀訣竅：</b><br>
+                {current_channel_meta['interpretation']}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # 氣象判讀教學小百科
+        with st.expander("📚 衛星雲圖判讀知識庫 (專業氣象心法)", expanded=True):
+            st.markdown("""
+            1. **彩色紅外線 (IR Color)**：
+               - 紅外線測量的是**雲頂溫度**。溫度越低（代表雲頂高聳發展旺盛），顯示為純白色或濃郁色塊。
+               - 不受日夜限制，全天候 24 小時均可觀測。
+            2. **色調強化 (Enhanced IR)**：
+               - 將強烈對流低溫雲頂（約 -40°C 至 -80°C）以鮮豔色彩區分（綠色、黃色、橘紅色、粉紫色）。
+               - **對流旺盛的降雨核心**（如雷陣雨或颱風眼牆）會呈現紅色或紫色。
+            3. **真實色彩 (True Color)**：
+               - 日間使用可見光紅綠藍三原色合成，最接近人眼太空俯瞰畫面。
+               - 能清晰分辨陸地綠地、海洋湛藍與捲雲、積雲的立體層次。
+            4. **雷達迴波 (Radar)**：
+               - 主動發射微波偵測水滴粒子，數值越高 (dBZ) 代表降雨越強烈，適合評估未來 1-2 小時即時降雨。
+            """)
+
+        # 快捷頻道卡片切換
+        st.markdown("##### ⚡ 快速頻道推薦")
+        col_q1, col_q2 = st.columns(2)
+        with col_q1:
+            st.markdown("""
+            - 🇹🇼 **台灣彩色紅外線**：日常降雨預警首選
+            - 🌈 **色調強化**：強烈午後雷雨與颱風觀測
+            """)
+        with col_q2:
+            st.markdown("""
+            - 📡 **雷達整合圖**：即時降水與豪大雨監控
+            - 🌏 **東亞全區**：觀察冷鋒南下與華南雲系
+            """)
+
+
+# =========================================================================
+# TAB 4: SQLite 資料庫檢查器 (課程序號 8, 9, 10, 20)
+# =========================================================================
+with tab4:
     st.subheader(f"💾 SQLite 資料庫驗證 (符合 CWA O-A0003-001 欄位)")
     st.markdown("""
     使用標準 SQL 檢查資料庫內容（課程序號 9 & 10）：

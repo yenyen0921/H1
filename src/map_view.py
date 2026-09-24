@@ -1,7 +1,7 @@
 """
 台灣氣溫地圖視覺化模組 (課程序號 17, 18, 19)
 支援中央氣象署 CWA O-A0003-001 觀測站經緯度與即時天氣觀測。
-使用 Folium 繪製互動式地圖，依據溫度高低提供色彩標記、資訊快顯 (Popup) 與圖例 (Legend)。
+使用 Folium 繪製互動式地圖，依據溫度高低提供色彩標記、資訊快顯 (Popup)、圖例 (Legend) 與衛星/雷達圖層疊加。
 """
 
 import folium
@@ -50,17 +50,77 @@ def get_temperature_category_label(avg_temp: float) -> str:
         return "炎熱 (> 30°C)"
 
 
-def create_weather_map(df_date: pd.DataFrame, selected_date: str) -> folium.Map:
+def create_weather_map(
+    df_date: pd.DataFrame,
+    selected_date: str,
+    show_radar: bool = False,
+    show_satellite: bool = False
+) -> folium.Map:
     """
     建立指定日期的台灣氣溫視覺化地圖 (課程序號 17, 18, 19)
-    整合 CWA O-A0003-001 測站經緯度
+    整合 CWA O-A0003-001 測站經緯度、多底圖切換與即時氣象衛星/雷達圖層
     """
     m = folium.Map(
         location=DEFAULT_CENTER,
         zoom_start=7.4,
-        tiles="OpenStreetMap",
+        tiles=None,
         control_scale=True
     )
+
+    # 1. 基礎底圖群組
+    folium.TileLayer(
+        "OpenStreetMap",
+        name="🗺️ 街道地圖 (OpenStreetMap)",
+        control=True
+    ).add_to(m)
+
+    folium.TileLayer(
+        "CartoDB positron",
+        name="⚪ 極簡淺色 (CartoDB)",
+        control=True
+    ).add_to(m)
+
+    folium.TileLayer(
+        "CartoDB dark_matter",
+        name="🌙 科技深色 (Dark Matter)",
+        control=True
+    ).add_to(m)
+
+    folium.TileLayer(
+        tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        attr="Esri World Imagery",
+        name="🛰️ 航照衛星底圖 (Esri Satellite)",
+        control=True
+    ).add_to(m)
+
+    # 2. 氣象雷達迴波圖疊加層 (CWA 雷達整合，邊界涵蓋台灣海域)
+    radar_bounds = [[20.4, 118.0], [26.8, 124.0]]
+    folium.raster_layers.ImageOverlay(
+        name="📡 即時雷達迴波圖 (CWA)",
+        image="https://www.cwa.gov.tw/Data/radar/CV1_1000.png",
+        bounds=radar_bounds,
+        opacity=0.65,
+        interactive=False,
+        cross_origin=False,
+        show=show_radar,
+        control=True
+    ).add_to(m)
+
+    # 3. 台灣鄰近彩色雲圖疊加層
+    sat_bounds = [[19.5, 117.5], [27.2, 124.5]]
+    folium.raster_layers.ImageOverlay(
+        name="☁️ 台灣衛星雲圖 (CWA TWI)",
+        image="https://www.cwa.gov.tw/Data/satellite/TWI_IR1_CR_800/TWI_IR1_CR_800.jpg",
+        bounds=sat_bounds,
+        opacity=0.60,
+        interactive=False,
+        cross_origin=False,
+        show=show_satellite,
+        control=True
+    ).add_to(m)
+
+    # 測站標記群組
+    station_group = folium.FeatureGroup(name="📍 CWA 氣象測站觀測點", show=True)
 
     # 頂部標題
     title_html = f"""
@@ -165,8 +225,8 @@ def create_weather_map(df_date: pd.DataFrame, selected_date: str) -> folium.Map:
             weight=3,
             fill=True,
             fill_color=color,
-            fill_opacity=0.65
-        ).add_to(m)
+            fill_opacity=0.75
+        ).add_to(station_group)
 
         folium.Marker(
             location=[float(lat), float(lon)],
@@ -179,6 +239,11 @@ def create_weather_map(df_date: pd.DataFrame, selected_date: str) -> folium.Map:
                 </div>
                 """
             )
-        ).add_to(m)
+        ).add_to(station_group)
+
+    station_group.add_to(m)
+
+    # 圖層控制器 (可切換底圖、雷達迴波、衛星雲圖與測站標記)
+    folium.LayerControl(position="topright", collapsed=False).add_to(m)
 
     return m

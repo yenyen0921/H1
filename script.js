@@ -25,12 +25,34 @@ const streetTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.
     maxZoom: 19
 });
 
+// 衛星空照圖 (Esri World Imagery)
+const satTiles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '&copy; Esri World Imagery',
+    maxZoom: 18
+});
+
 darkTiles.addTo(map);
 
-let currentLayer = 'temp'; // 'temp' 或 'rain'
+let currentLayer = 'temp'; // 'temp', 'rain', 'satellite', 'radar'
 let showLabels = true;
 let weatherData = [];
 let markerGroup = L.layerGroup().addTo(map);
+
+// 衛星雲圖與雷達疊加層
+const TAIWAN_SAT_BOUNDS = [[19.5, 117.5], [27.2, 124.5]];
+const TAIWAN_RADAR_BOUNDS = [[20.4, 118.0], [26.8, 124.0]];
+
+let satOverlay = L.imageOverlay(
+    'https://www.cwa.gov.tw/Data/satellite/TWI_IR1_CR_800/TWI_IR1_CR_800.jpg',
+    TAIWAN_SAT_BOUNDS,
+    { opacity: 0.70, interactive: false }
+);
+
+let radarOverlay = L.imageOverlay(
+    'https://www.cwa.gov.tw/Data/radar/CV1_1000.png',
+    TAIWAN_RADAR_BOUNDS,
+    { opacity: 0.70, interactive: false }
+);
 
 // 色彩計算函式 (氣溫)
 function getTempColor(t) {
@@ -144,11 +166,22 @@ function renderMarkers() {
     });
 }
 
+function clearActiveLayerButtons() {
+    document.getElementById('btn-temp').classList.remove('active');
+    document.getElementById('btn-rain').classList.remove('active');
+    document.getElementById('btn-satellite').classList.remove('active');
+    document.getElementById('btn-radar').classList.remove('active');
+    document.getElementById('sat-control-group').style.display = 'none';
+}
+
 // 事件監聽：切換氣溫圖層
 document.getElementById('btn-temp').addEventListener('click', (e) => {
+    clearActiveLayerButtons();
     currentLayer = 'temp';
     e.target.classList.add('active');
-    document.getElementById('btn-rain').classList.remove('active');
+
+    map.removeLayer(satOverlay);
+    map.removeLayer(radarOverlay);
 
     document.getElementById('legend-title').innerText = '°C';
     document.getElementById('legend-gradient').style.background = 'linear-gradient(to right, #3b82f6, #0ea5e9, #10b981, #f59e0b, #ef4444)';
@@ -159,15 +192,63 @@ document.getElementById('btn-temp').addEventListener('click', (e) => {
 
 // 事件監聽：切換降雨機率圖層
 document.getElementById('btn-rain').addEventListener('click', (e) => {
+    clearActiveLayerButtons();
     currentLayer = 'rain';
     e.target.classList.add('active');
-    document.getElementById('btn-temp').classList.remove('active');
+
+    map.removeLayer(satOverlay);
+    map.removeLayer(radarOverlay);
 
     document.getElementById('legend-title').innerText = '% 降雨機率';
     document.getElementById('legend-gradient').style.background = 'linear-gradient(to right, #94a3b8, #10b981, #0ea5e9, #3b82f6)';
     document.getElementById('legend-labels').innerHTML = '<span>0</span><span>20</span><span>50</span><span>80</span><span>100</span>';
 
     renderMarkers();
+});
+
+// 事件監聽：切換衛星雲圖圖層
+document.getElementById('btn-satellite').addEventListener('click', (e) => {
+    clearActiveLayerButtons();
+    currentLayer = 'satellite';
+    e.target.classList.add('active');
+    document.getElementById('sat-control-group').style.display = 'block';
+
+    map.removeLayer(radarOverlay);
+    satOverlay.addTo(map);
+
+    document.getElementById('legend-title').innerText = '☁️ 雲頂厚度/對流';
+    document.getElementById('legend-gradient').style.background = 'linear-gradient(to right, #38bdf8, #818cf8, #f472b6, #fb7185, #ffffff)';
+    document.getElementById('legend-labels').innerHTML = '<span>薄雲</span><span>一般</span><span>對流</span><span>強烈</span><span>雲頂最高</span>';
+
+    renderMarkers();
+});
+
+// 事件監聽：切換雷達迴波圖層
+document.getElementById('btn-radar').addEventListener('click', (e) => {
+    clearActiveLayerButtons();
+    currentLayer = 'radar';
+    e.target.classList.add('active');
+    document.getElementById('sat-control-group').style.display = 'block';
+
+    map.removeLayer(satOverlay);
+    radarOverlay.addTo(map);
+
+    document.getElementById('legend-title').innerText = 'dBZ 雷達回波強度';
+    document.getElementById('legend-gradient').style.background = 'linear-gradient(to right, #00ffff, #0000ff, #00ff00, #ffff00, #ff0000, #ff00ff)';
+    document.getElementById('legend-labels').innerHTML = '<span>10</span><span>20</span><span>30</span><span>40</span><span>50</span><span>60+</span>';
+
+    renderMarkers();
+});
+
+// 透明度滑桿事件
+document.getElementById('sat-opacity').addEventListener('input', (e) => {
+    let val = parseFloat(e.target.value) / 100.0;
+    if (map.hasLayer(satOverlay)) {
+        satOverlay.setOpacity(val);
+    }
+    if (map.hasLayer(radarOverlay)) {
+        radarOverlay.setOpacity(val);
+    }
 });
 
 // 事件監聽：切換數值標籤顯示
@@ -178,18 +259,32 @@ document.getElementById('toggle-marker').addEventListener('change', (e) => {
 
 // 底圖切換：深色
 document.getElementById('base-dark').addEventListener('click', (e) => {
-    e.target.classList.add('active');
+    document.getElementById('base-dark').classList.add('active');
     document.getElementById('base-street').classList.remove('active');
+    document.getElementById('base-sat').classList.remove('active');
     map.removeLayer(streetTiles);
+    map.removeLayer(satTiles);
     darkTiles.addTo(map);
 });
 
 // 底圖切換：街道圖
 document.getElementById('base-street').addEventListener('click', (e) => {
-    e.target.classList.add('active');
+    document.getElementById('base-street').classList.add('active');
     document.getElementById('base-dark').classList.remove('active');
+    document.getElementById('base-sat').classList.remove('active');
     map.removeLayer(darkTiles);
+    map.removeLayer(satTiles);
     streetTiles.addTo(map);
+});
+
+// 底圖切換：衛星空照圖
+document.getElementById('base-sat').addEventListener('click', (e) => {
+    document.getElementById('base-sat').classList.add('active');
+    document.getElementById('base-dark').classList.remove('active');
+    document.getElementById('base-street').classList.remove('active');
+    map.removeLayer(darkTiles);
+    map.removeLayer(streetTiles);
+    satTiles.addTo(map);
 });
 
 // 重新定位全台
@@ -200,5 +295,84 @@ document.getElementById('btn-locate').addEventListener('click', () => {
     });
 });
 
+// =========================================================================
+// 衛星雲圖分析中心彈窗互動邏輯 (Satellite Hub Modal)
+// =========================================================================
+const satChannels = {
+    'TWI_IR1_CR_800': {
+        name: '🇹🇼 台灣彩色紅外線雲圖',
+        url: 'https://www.cwa.gov.tw/Data/satellite/TWI_IR1_CR_800/TWI_IR1_CR_800.jpg',
+        desc: '針對台灣鄰近海域之彩色紅外線影像，濃白處代表雲頂高、水氣充足，能掌握即時雨帶進程。'
+    },
+    'TWI_IR1_MB_800': {
+        name: '🌈 台灣色調強化雲圖',
+        url: 'https://www.cwa.gov.tw/Data/satellite/TWI_IR1_MB_800/TWI_IR1_MB_800.jpg',
+        desc: '依據雲頂溫度分級色彩強化，紅色與橘色區域代表強對流胞發展，常用於掌握午後豪雨與雷暴。'
+    },
+    'TWI_TRGB_1000': {
+        name: '🌍 台灣真實色彩雲圖 (日間)',
+        url: 'https://www.cwa.gov.tw/Data/satellite/TWI_TRGB_1000/TWI_TRGB_1000.jpg',
+        desc: '以可見光紅綠藍三原色合成，太空視角清晰俯瞰台灣地形輪廓與積雲、層雲細膩紋理。'
+    },
+    'CV1_1000': {
+        name: '📡 台灣雷達迴波整合圖',
+        url: 'https://www.cwa.gov.tw/Data/radar/CV1_1000.png',
+        desc: '全台都卜勒氣象雷達合成圖，即時反應空中水滴降水訊號（黃色、紅色為大雨或豪雨區）。'
+    },
+    'LCC_IR1_CR_1000': {
+        name: '🌏 東亞全區彩色雲圖',
+        url: 'https://www.cwa.gov.tw/Data/satellite/LCC_IR1_CR_1000/LCC_IR1_CR_1000.jpg',
+        desc: '涵蓋東亞、西太平洋與南海廣袤區域，適合觀察跨國鋒面系統、颱風移動軌跡與季風環流。'
+    }
+};
+
+const satModal = document.getElementById('sat-modal');
+const satPreviewImg = document.getElementById('sat-preview-img');
+const satLoading = document.getElementById('sat-loading');
+const satChannelTitle = document.getElementById('sat-channel-title');
+const satChannelDesc = document.getElementById('sat-channel-desc');
+const modalSatTime = document.getElementById('modal-sat-time');
+
+document.getElementById('btn-open-sat-hub').addEventListener('click', () => {
+    satModal.style.display = 'flex';
+    let now = new Date();
+    let pad = (n) => n.toString().padStart(2, '0');
+    modalSatTime.innerText = `觀測時間：${now.getFullYear()}/${pad(now.getMonth()+1)}/${pad(now.getDate())} ${pad(now.getHours())}:${pad(Math.floor(now.getMinutes()/10)*10)} (每10分鐘更新)`;
+});
+
+document.getElementById('btn-close-modal').addEventListener('click', () => {
+    satModal.style.display = 'none';
+});
+
+satModal.addEventListener('click', (e) => {
+    if (e.target === satModal) {
+        satModal.style.display = 'none';
+    }
+});
+
+// 切換雲圖頻道
+document.querySelectorAll('.sat-tab-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.sat-tab-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+
+        let chKey = e.target.dataset.channel;
+        let ch = satChannels[chKey];
+        if (ch) {
+            satChannelTitle.innerText = ch.name;
+            satChannelDesc.innerText = ch.desc;
+            satLoading.style.display = 'block';
+            satPreviewImg.style.opacity = '0.4';
+
+            satPreviewImg.src = `${ch.url}?t=${Date.now()}`;
+            satPreviewImg.onload = () => {
+                satLoading.style.display = 'none';
+                satPreviewImg.style.opacity = '1';
+            };
+        }
+    });
+});
+
 // 啟動資料載入
 loadData();
+

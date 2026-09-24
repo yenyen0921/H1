@@ -58,8 +58,15 @@
             <div class="layer-title">圖層</div>
             <button class="layer-btn active" id="btn-temp">🌡️ 氣溫</button>
             <button class="layer-btn" id="btn-rain">🌧️ 降雨機率</button>
+            <button class="layer-btn" id="btn-satellite">🛰️ 衛星雲圖</button>
+            <button class="layer-btn" id="btn-radar">📡 雷達迴波</button>
         </div>
         
+        <div class="layer-group" id="sat-control-group" style="display: none;">
+            <div class="layer-title">雲圖透明度</div>
+            <input type="range" id="sat-opacity" min="10" max="100" value="70" style="width: 100%; accent-color: #0284c7;">
+        </div>
+
         <div class="layer-group">
             <label class="checkbox-container">
                 <input type="checkbox" checked id="toggle-marker">
@@ -73,10 +80,49 @@
             <div class="map-switcher">
                 <button class="switcher-btn active" id="base-dark">深色</button>
                 <button class="switcher-btn" id="base-street">街道圖</button>
+                <button class="switcher-btn" id="base-sat">衛星圖</button>
             </div>
         </div>
         
         <button class="btn-primary" id="btn-locate">📌 重新定位全台</button>
+        <button class="btn-secondary" id="btn-open-sat-hub" style="margin-top: 8px;">🛰️ 雲圖分析中心</button>
+    </div>
+
+    <!-- Satellite Hub Modal / Viewer -->
+    <div class="sat-modal" id="sat-modal" style="display: none;">
+        <div class="sat-modal-content">
+            <div class="sat-modal-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 20px;">🛰️</span>
+                    <div>
+                        <h2 style="font-size: 16px; margin: 0; font-weight: 700;">CWA 氣象衛星雲圖中心</h2>
+                        <span style="font-size: 11px; color: #94a3b8;" id="modal-sat-time">觀測時間：即時連線中...</span>
+                    </div>
+                </div>
+                <button class="close-btn" id="btn-close-modal">✕</button>
+            </div>
+
+            <!-- Satellite Channel Tabs -->
+            <div class="sat-channel-tabs">
+                <button class="sat-tab-btn active" data-channel="TWI_IR1_CR_800">🇹🇼 台灣彩色</button>
+                <button class="sat-tab-btn" data-channel="TWI_IR1_MB_800">🌈 色調強化</button>
+                <button class="sat-tab-btn" data-channel="TWI_TRGB_1000">🌍 真實色彩</button>
+                <button class="sat-tab-btn" data-channel="CV1_1000">📡 雷達整合</button>
+                <button class="sat-tab-btn" data-channel="LCC_IR1_CR_1000">🌏 東亞全區</button>
+            </div>
+
+            <!-- Image View -->
+            <div class="sat-image-wrap">
+                <img id="sat-preview-img" src="https://www.cwa.gov.tw/Data/satellite/TWI_IR1_CR_800/TWI_IR1_CR_800.jpg" alt="CWA Satellite Cloud" />
+                <div class="sat-loading" id="sat-loading">載入影像中...</div>
+            </div>
+
+            <!-- Interpretation Info -->
+            <div class="sat-info-box">
+                <h4 id="sat-channel-title">🇹🇼 台灣鄰近彩色紅外線雲圖</h4>
+                <p id="sat-channel-desc">清晰呈現台灣本島及周邊海域雲層厚度與高空雲系，濃白色表示雲頂高、水氣充足。</p>
+            </div>
+        </div>
     </div>
 
     <!-- Bottom Legend -->
@@ -101,3 +147,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+

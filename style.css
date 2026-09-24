@@ -302,3 +302,165 @@ body, html {
     font-size: 12px;
     color: #cbd5e1;
 }
+
+/* Secondary Button */
+.btn-secondary {
+    width: 100%;
+    padding: 9px;
+    background: rgba(30, 41, 59, 0.8);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-secondary:hover {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: #38bdf8;
+    color: #fff;
+}
+
+/* Satellite Hub Modal */
+.sat-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(11, 15, 25, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.97); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.sat-modal-content {
+    background: #0f172a;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 640px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 20px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+    color: #f8fafc;
+}
+
+.sat-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 12px;
+    margin-bottom: 14px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.sat-channel-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.sat-tab-btn {
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.sat-tab-btn.active, .sat-tab-btn:hover {
+    background: #0284c7;
+    color: #fff;
+    border-color: #38bdf8;
+}
+
+.sat-image-wrap {
+    position: relative;
+    width: 100%;
+    min-height: 320px;
+    background: #020617;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sat-image-wrap img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    max-height: 480px;
+    transition: opacity 0.2s ease;
+}
+
+.sat-loading {
+    position: absolute;
+    color: #38bdf8;
+    font-size: 13px;
+    display: none;
+}
+
+.sat-info-box {
+    margin-top: 14px;
+    background: rgba(30, 41, 59, 0.6);
+    border-radius: 8px;
+    padding: 12px;
+    border-left: 3px solid #38bdf8;
+}
+
+.sat-info-box h4 {
+    font-size: 14px;
+    margin-bottom: 4px;
+    color: #38bdf8;
+}
+
+.sat-info-box p {
+    font-size: 12px;
+    color: #cbd5e1;
+    line-height: 1.5;
+}
+
