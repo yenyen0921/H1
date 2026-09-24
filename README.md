@@ -9,7 +9,7 @@
 
 ## 🌐 快速體驗連結 (Quick Access)
 
-- **🖥️ 本機運行網址**：[http://localhost:8501](http://localhost:8501)（若已在電腦啟動程式，點擊即可直接開啟）
+
 - **☁️ 雲端公開網址**：可透過 [Streamlit Community Cloud](https://share.streamlit.io/) 一鍵綁定本儲存庫免費部署，獲得全公開作品網址！
 
 ---
