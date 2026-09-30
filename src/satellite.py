@@ -7,7 +7,10 @@
 import re
 import time
 from typing import Dict, List, Optional, Any
-import requests
+try:
+    import requests
+except ImportError:
+    requests = None
 
 # CWA 即時衛星圖資目錄與最新清單 JS 來源
 CWA_SAT_CATALOG_URL = "https://www.cwa.gov.tw/Data/js/obs_img/Observe_sat.js"
@@ -113,9 +116,23 @@ def fetch_cwa_catalog(max_age_seconds: int = 60) -> Dict[str, List[Dict[str, str
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) WeatherAgent/1.0"
         }
-        resp = requests.get(CWA_SAT_CATALOG_URL, headers=headers, timeout=6)
-        if resp.status_code == 200:
-            text = resp.text
+        text = None
+        if requests is not None:
+            try:
+                resp = requests.get(CWA_SAT_CATALOG_URL, headers=headers, timeout=6)
+                if resp.status_code == 200:
+                    text = resp.text
+            except Exception:
+                pass
+
+        if text is None:
+            import urllib.request
+            req = urllib.request.Request(CWA_SAT_CATALOG_URL, headers=headers)
+            with urllib.request.urlopen(req, timeout=6) as response:
+                if response.status == 200:
+                    text = response.read().decode("utf-8")
+
+        if text:
             # 格式：{"img":'TWI_IR1_CR_800/TWI_IR1_CR_800-2026-09-24-15-40.jpg', 'text':'2026/09/24 15:40'}
             pattern = re.compile(r'\{"img":\'([^\']+)\',\s*\'text\':\'([^\']+)\'\}')
             matches = pattern.findall(text)

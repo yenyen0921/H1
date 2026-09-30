@@ -10,7 +10,10 @@ import sys
 from datetime import datetime, timedelta
 from typing import Optional, Tuple, Dict, Any
 import pandas as pd
-import requests
+try:
+    import requests
+except ImportError:
+    requests = None
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
@@ -56,23 +59,36 @@ REGION_MAPPING = {
 def fetch_from_cwa_api(api_key: str) -> Optional[dict]:
     """
     自中央氣象署 CWA O-A0003-001 API 取得即時 JSON 觀測報告 (課程序號 4)
+    具備 requests 與 Python 內建 urllib.request 雙重連線備援機制。
     """
-    url = f"{CWA_API_BASE_URL}/{CWA_DATASET_ID}"
+    url = f"{CWA_API_BASE_URL}/{CWA_DATASET_ID}?format=JSON"
     headers = {
-        "Authorization": api_key.strip()
+        "Authorization": api_key.strip(),
+        "User-Agent": "Taiwan-Weather-App/1.0"
     }
-    params = {
-        "format": "JSON"
-    }
+    
+    # 方式一：優先嘗試 requests
     try:
-        response = requests.get(url, headers=headers, params=params, timeout=10)
+        import requests
+        response = requests.get(url, headers=headers, timeout=10)
         if response.status_code == 200:
             return response.json()
-        print(f"[CWA O-A0003-001] 請求失敗，HTTP 狀態碼: {response.status_code}，回應: {response.text}")
-        return None
+        print(f"[CWA O-A0003-001] requests 狀態碼: {response.status_code}，回應: {response.text}")
+    except Exception:
+        pass
+
+    # 方式二：使用 Python 標準庫 urllib.request (免外部依賴備援)
+    try:
+        import urllib.request
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            if resp.status == 200:
+                data_bytes = resp.read()
+                return json.loads(data_bytes.decode("utf-8"))
     except Exception as e:
         print(f"[CWA O-A0003-001] 連線異常: {e}")
-        return None
+        
+    return None
 
 
 def load_sample_json(file_path: Optional[str] = None) -> dict:
